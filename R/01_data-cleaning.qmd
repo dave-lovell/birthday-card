@@ -1,0 +1,35 @@
+---
+title: "Data cleaning"
+author: "Dave"
+format: html
+editor: visual
+---
+
+## Libraries
+
+```{r libraries}
+library(here)
+library(fs)
+
+library(dplyr)
+library(stringr)
+library(purrr)
+```
+
+## Read data
+
+```{r read_data}
+messages <- readLines(here("messages.txt"))
+
+msg_starts <- str_detect(messages, "^\\d\\d/\\d\\d/\\d{4}")
+
+message_no <- cumsum(msg_starts)
+
+messages <- map_chr(1:max(message_no),
+                    \(x){
+                      str_c(messages[message_no == x], collapse = "\n")
+                    }
+                    )
+
+
+```
