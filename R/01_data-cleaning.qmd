@@ -14,13 +14,20 @@ library(fs)
 library(dplyr)
 library(stringr)
 library(purrr)
+library(lubridate)
 ```
 
 ## Read data
 
 ```{r read_data}
 messages <- readLines(here("messages.txt"))
+```
 
+## Format data
+
+### Split messages
+
+```{r split_messages}
 msg_starts <- str_detect(messages, "^\\d\\d/\\d\\d/\\d{4}")
 
 message_no <- cumsum(msg_starts)
@@ -31,5 +38,44 @@ messages <- map_chr(1:max(message_no),
                     }
                     )
 
+rm(message_no, msg_starts)
+```
 
+### Split messages from metadata
+
+```{r format_metadata}
+messages <- tibble(raw = messages)
+
+messages <- 
+  mutate(
+    messages,
+    
+    timestamp = 
+      str_extract(raw, "\\d\\d/\\d\\d/\\d{4}, \\d\\d:\\d\\d") |> 
+      dmy_hm(),
+    
+    sender = 
+      str_extract(raw, "(?<= - )(Isobel 🐧|Dave Lovell)(?=:)") |> 
+      str_remove("🐧|( Lovell)") |> 
+      factor(),
+    
+    body = 
+      str_extract(raw, "(?<=( - Dave Lovell:)|( - Isobel 🐧:)).+(?=$)") |> 
+      str_trim()
+    
+  )
+```
+
+### Filter messages
+
+```{r filter_messages}
+messages <- filter(messages, !is.na(sender), body != "<Media omitted>")
+
+nrow(messages)
+```
+
+## Save
+
+```{r save}
+saveRDS(messages, here("messages", "formatted-messages.RDS"))
 ```

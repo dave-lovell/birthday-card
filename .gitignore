@@ -6,3 +6,9 @@
 .quarto
 
 messages.txt
+messages/**
+
+R/*_files/
+R/*_cache/
+
+**.html
