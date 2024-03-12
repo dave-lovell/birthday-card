@@ -1,0 +1,77 @@
+---
+title: "Exploring and visualising"
+author: "Dave"
+format: html
+editor: visual
+---
+
+## Libraries
+
+```{r libraries}
+library(fs)
+library(here)
+
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(emoji)
+library(forcats)
+library(lubridate)
+```
+
+## Read data
+
+```{r read_data}
+messages <- readRDS(here("messages", "formatted-messages.RDS"))
+```
+
+## Exploratory analysis
+
+### Messages per month
+
+```{r messages_per_week}
+
+messages <- 
+  mutate(messages,
+         year_month =
+           ym(str_c(year(timestamp), month(timestamp), sep = " ")))
+
+
+messages |> 
+  summarise(messages = n(), .by = c(year_month, sender)) |> 
+  
+  ggplot(aes(y = messages, x = year_month, 
+             colour = sender)) + 
+  
+  geom_line(linewidth = 1, alpha = 0.8) +
+  
+  scale_colour_manual(
+    values = c("Dave" = "skyblue", "Isobel" = "coral3")
+  ) + 
+  
+  scale_x_date(
+    breaks = "years",
+    label = year
+  ) + 
+  
+  theme_bw() +
+  
+  labs(y = "Monthly Whatsapp messages", 
+       x = "Date",
+       title = "Whatsapp exchanges", 
+       caption = "I love you 1e6") +
+  
+  geom_vline(xintercept = ymd("2022-02-15"),
+             linetype = "dashed", colour = "gray30") +
+  geom_vline(xintercept = ymd("2022-09-10"),
+             linetype = "dashed", colour = "gray30") +
+  
+  annotate("text", label = "I ask you out",
+           x = ymd("2022-02-01"), y = 375, hjust = 1,
+           colour = "gray30") +
+  
+    annotate("text", label = "We get married",
+           x = ymd("2022-09-25"), y = 275, hjust = 0,
+           colour = "gray30")
+```

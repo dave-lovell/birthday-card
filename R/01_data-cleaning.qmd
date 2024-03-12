@@ -56,7 +56,7 @@ messages <-
     
     sender = 
       str_extract(raw, "(?<= - )(Isobel 🐧|Dave Lovell)(?=:)") |> 
-      str_remove("🐧|( Lovell)") |> 
+      str_remove(" 🐧|( Lovell)") |> 
       factor(),
     
     body = 
