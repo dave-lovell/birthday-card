@@ -18,6 +18,7 @@ library(stringr)
 library(emoji)
 library(forcats)
 library(lubridate)
+library(Cairo)
 ```
 
 ## Read data
@@ -38,6 +39,7 @@ messages <-
            ym(str_c(year(timestamp), month(timestamp), sep = " ")))
 
 
+msg_plot <- 
 messages |> 
   summarise(messages = n(), .by = c(year_month, sender)) |> 
   
@@ -74,4 +76,10 @@ messages |>
     annotate("text", label = "We get married",
            x = ymd("2022-09-25"), y = 275, hjust = 0,
            colour = "gray30")
+
+ggsave(here("birthday-card-front.png"), msg_plot,
+       type = "cairo",
+       width = 7, height = 5,
+       units = "in",
+       dpi = 400)
 ```
